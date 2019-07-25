@@ -7,9 +7,9 @@ public class Puzzle15Matrix {
     public static final int SIZE = 4; 
     public static final int EMPTY = 0;
     // private variables
-    private int[][] tiles = new int[SIZE][SIZE];
-    private int emptyCol = 0;
-    private int emptyRow = 0;
+    private int[][] tiles;
+    private int emptyCol;
+    private int emptyRow;
     private Configuration configuration;
 
     // fill in the array 
@@ -36,7 +36,7 @@ public class Puzzle15Matrix {
     }
     // constructors
     public Puzzle15Matrix() {
-        tiles = new int[SIZE][SIZE];
+        this.tiles = new int[SIZE][SIZE];
         this.emptyCol = 0;
         this.emptyRow = 0;
         this.tiles = this.fillTiles();
@@ -45,12 +45,29 @@ public class Puzzle15Matrix {
     public Puzzle15Matrix(int emptyCol, int emptyRow) {
         if ((emptyRow > SIZE -1 || emptyRow < 0) || (emptyCol > SIZE - 1 || emptyCol < 0)) {
             System.out.println("Error: Fatar erro ");
+            System.out.println("Please note that the size of the board is " + SIZE + " * " + SIZE);
             System.exit(0);
         } else {
             this.emptyCol = emptyCol;
             this.emptyRow  = emptyRow;
+            this.tiles = this.fillTiles();
         }
-        this.tiles = this.fillTiles();
+    }
+
+    public Puzzle15Matrix(String format) {
+        this.tiles = new int[SIZE][SIZE];
+        // TODO: setup configuration and tiles
+        this.configuration = new Configuration(format);
+        this.configuration.initialise(this.tiles);
+        // TODO: setup emptyCol and emptyRow
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (this.tiles[i][j] == 0) {
+                    this.emptyRow  = i;
+                    this.emptyCol = j;
+                }
+            }
+        }
     }
 
     public Puzzle15Matrix(Puzzle15Matrix puzzleMatrix) {
@@ -61,21 +78,6 @@ public class Puzzle15Matrix {
             this.tiles = puzzleMatrix.getTiles();
             this.emptyCol = puzzleMatrix.getEmptyColumn();
             this.emptyRow = puzzleMatrix.getEmptyRow();
-        }
-    }
-
-    public Puzzle15Matrix(String format) {
-        // TODO: setup configuration and tiles
-        configuration = new Configuration(format);
-        this.tiles = configuration.initialise(this.tiles);
-        // TODO: setup emptyCol and emptyRow
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (this.tiles[i][j] == 0) {
-                    this.emptyRow  = i;
-                    this.emptyCol = j;
-                }
-            }
         }
     }
 
@@ -136,20 +138,20 @@ public class Puzzle15Matrix {
         switch(direction) {
             case 'U':
                 // indicates sliding up the tile that is initially below the empty space,
-                if (this.emptyRow != 0) {
-                    this.tiles[emptyRow][emptyCol] = this.tiles[emptyRow - 1][emptyCol];
-                    this.tiles[emptyRow - 1][emptyCol] = 0;
-                    emptyRow--;         
+                if (this.emptyRow != SIZE-1) {
+                    this.tiles[emptyRow][emptyCol] = this.tiles[emptyRow + 1][emptyCol]; 
+                    this.tiles[emptyRow + 1][emptyCol] = 0;
+                    emptyRow++;
                 } else {
                     System.out.println("Error: Your are trying to move out of the board");
                 }
                 break;
             case 'D':
                 // is for the tile above the empty space
-                if (this.emptyRow != SIZE-1) {
-                    this.tiles[emptyRow][emptyCol] = this.tiles[emptyRow + 1][emptyCol]; 
-                    this.tiles[emptyRow + 1][emptyCol] = 0;
-                    emptyRow++;
+                if (this.emptyRow != 0) {
+                    this.tiles[emptyRow][emptyCol] = this.tiles[emptyRow - 1][emptyCol];
+                    this.tiles[emptyRow - 1][emptyCol] = 0;
+                    emptyRow--;         
                 } else {
                     System.out.println("Error: Your are trying to move out of the board");
                 }
@@ -187,10 +189,11 @@ public class Puzzle15Matrix {
         } else {
             int number = 1;
             for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; i < SIZE -1 ; j++) {
-                    if (this.tiles[i][j] != number++) {
+                for (int j = 0; j < SIZE ; j++) {
+                    if (this.tiles[i][j] != number%16) {
                         return false;
                     }
+                    number++;
                 }
             }
             return true;
@@ -202,7 +205,7 @@ public class Puzzle15Matrix {
         for (int i = 0; i < SIZE; i ++) {
             for (int j = 0; j < SIZE; j++) {
                 if (this.tiles[i][j] == 0) {
-                    System.out.print(" |  | ");
+                    System.out.print(" | | ");
                 } else {
                     System.out.print(" |" + this.tiles[i][j] + "| ");
                 }
@@ -222,7 +225,7 @@ public class Puzzle15Matrix {
             printing the resulting game board; stops when the puzzle is solved or the user inputs
             ’q’
         */
-        while(!this.isSolved() || keyboard.hasNextInt()) {
+        while(!this.isSolved()) {
             char direction = keyboard.next().charAt(0);
             if (direction == 'q') {
                 System.exit(0);

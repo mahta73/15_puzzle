@@ -5,44 +5,62 @@ public class Puzzle15Array {
 
     public static final int SIZE = 4;
     public static final byte EMPTY = 0;
-    private byte[] tiles = new byte[SIZE];
-    private int emptyPos = 0;
+    private byte[] tiles;
+    private int emptyPos;
     private Configuration configuration;
 
     // constructors
     // fill in the array 
-    public byte[] fillTiles() {
-        byte randomNumber; 
-        for (int i = 0; i < SIZE; i ++) {
-            if ( i == this.emptyPos) {
+    public void fillTiles() {
+        int randSize = 15;
+        byte[] rand2;
+        byte[] rand = new byte[randSize];
+        for (int i = 0; i < randSize; i++) {
+            rand[i] = (byte)(i + 1);
+        }
+
+        byte randomNumber;
+        byte num;
+        for (int i = 0; i < SIZE * SIZE; i++) {
+            if (i == this.emptyPos) {
                 this.tiles[i] = 0;
             } else {
-                randomNumber = (byte)(( Math.random() * 14 ) + 1);
-                for (int j = 0 ; j < i; j++) {
-                    while (this.tiles[j] == randomNumber) {
-                        randomNumber = (byte)(( Math.random() * 14 ) + 1);
+                randomNumber = (byte)(Math.random() * (randSize-1));
+                this.tiles[i] = rand[randomNumber];
+                num = this.tiles[i];
+                randSize--;
+                rand2 = new byte[randSize];
+
+                for (int j = 0; j < randSize; j++) {
+                    if (rand[j] >= this.tiles[i]) {
+                        rand2[j] = rand[j+1];
+                    } else {
+                        rand2[j] = rand[j];
                     }
-                    this.tiles[i] = randomNumber ;
+                }
+                rand = new byte[randSize];
+                for (int  f= 0; f < randSize; f++) {
+                    rand[f] = rand2[f];
                 }
             }
         }
-        return this.tiles;
     }
     // constructors
     public Puzzle15Array() {
-        tiles = new byte[SIZE];
+        tiles = new byte[SIZE * SIZE];
         this.emptyPos = 0;
-        this.tiles = this.fillTiles();
+        this.fillTiles();
     }
 
     public Puzzle15Array(int emptyPos) {
-        if (emptyPos > SIZE -1 || emptyPos < 0) {
+        if (emptyPos > (SIZE * SIZE) -1 || emptyPos < 0) {
             System.out.println("Error: Fatar erro ");
             System.exit(0);
         } else {
+            tiles = new byte[SIZE * SIZE];
             this.emptyPos = emptyPos;
+            this.fillTiles();
         }
-        this.tiles = this.fillTiles();
     }
 
     public Puzzle15Array(Puzzle15Array puzzleArray) {
@@ -56,13 +74,14 @@ public class Puzzle15Array {
     }
 
     public Puzzle15Array(String format) {
+        tiles = new byte[SIZE * SIZE];
         // TODO: setup configuration and tiles
-        configuration = new Configuration(format);
-        this.tiles = configuration.initialise(this.tiles);
+        this.configuration = new Configuration(format);
+        this.configuration.initialise(this.tiles);
         // TODO: setup emptyCol and emptyRow
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < SIZE * SIZE; i++) {
             if (this.tiles[i] == 0) {
-                this.emptyPos = tiles[i];
+                this.emptyPos = i;
             }
         }
     }
@@ -109,14 +128,15 @@ public class Puzzle15Array {
 
     // is the game solved
     public boolean isSolved() {
-        if (this.tiles[SIZE - 1] != 0) {
+        if (this.tiles[(SIZE*SIZE)-1] != 0) {
             return false;
         } else {
             int number = 1;
-            for (int i = 0; i < SIZE; i++) {
-                if (this.tiles[i] != number++) {
+            for (int i = 0; i < SIZE*SIZE; i++) {
+                if (this.tiles[i] != number%16) {
                     return false;
                 }
+                number++;
             }
             return true;
         }
@@ -128,17 +148,7 @@ public class Puzzle15Array {
         switch(direction) {
             case 'U':
                 // indicates sliding up the tile that is initially below the empty space,
-                if (!(this.emptyPos-4 < 0) || (this.emptyPos-4 > SIZE)) {
-                    this.tiles[emptyPos] = this.tiles[emptyPos-4];
-                    this.tiles[emptyPos - 4] = 0;
-                    emptyPos -= 4;
-                } else {
-                    System.out.println("Error: Your are trying to move out of the board");
-                }
-                break;
-            case 'D':
-                // is for the tile above the empty space
-                if (!(this.emptyPos+4 < 0) || (this.emptyPos+4 > SIZE)) {
+                if (!(this.emptyPos+4 > SIZE*SIZE)) {
                     this.tiles[emptyPos] = this.tiles[emptyPos+4];
                     this.tiles[emptyPos+4] = 0;
                     emptyPos += 4;
@@ -146,9 +156,19 @@ public class Puzzle15Array {
                     System.out.println("Error: Your are trying to move out of the board");
                 }
                 break;
+            case 'D':
+                // is for the tile above the empty space
+                if (!(this.emptyPos-4 < 0)) {
+                    this.tiles[this.emptyPos] = this.tiles[this.emptyPos-4];
+                    this.tiles[this.emptyPos-4] = 0;
+                    emptyPos -= 4;
+                } else {
+                    System.out.println("Error: Your are trying to move out of the board");
+                }
+                break;
             case 'L':
                 // is for the tile at the right of the empty space
-                if (!(this.emptyPos+1 < 0) || (this.emptyPos+1 > SIZE)) {
+                if (!(this.emptyPos == (SIZE*SIZE)-1)) {
                     this.tiles[emptyPos] = this.tiles[emptyPos+1];
                     this.tiles[emptyPos+1] = 0;
                     emptyPos += 1;
@@ -158,7 +178,7 @@ public class Puzzle15Array {
                 break;
             case 'R':
                 // is for the tile at the left of the empty space
-                if (!(this.emptyPos-1 < 0) || (this.emptyPos-1 > SIZE)) {
+                if (!(this.emptyPos-1 < 0)) {
                     this.tiles[emptyPos] = this.tiles[emptyPos-1];
                     this.tiles[emptyPos-1] = 0;
                     emptyPos -= 1;
@@ -174,7 +194,8 @@ public class Puzzle15Array {
 
     public void printTiles() {
         for (int i = 0; i < this.tiles.length; i++) {
-            if (i % 4 == 0) {
+            if (i  % 4 == 0) {
+                System.out.println();
                 System.out.println("---------------------");
             }
             if (this.tiles[i] == 0) {
@@ -184,6 +205,8 @@ public class Puzzle15Array {
             }
                 
         }
+        System.out.println();
+        System.out.println("---------------------");
     }
 
     public void play() {
@@ -195,7 +218,7 @@ public class Puzzle15Array {
             printing the resulting game board; stops when the puzzle is solved or the user inputs
             ’q’
         */
-        while(!this.isSolved() || keyboard.hasNextInt()) {
+        while(!this.isSolved()) {
             char direction = keyboard.next().charAt(0);
             if (direction == 'q') {
                 System.exit(0);

@@ -1,5 +1,10 @@
-public class Configuration extends Puzzle15Matrix {
-    private String data;
+public class Configuration {
+    private String data = "";
+
+    // constructors
+    public Configuration() {
+        this.data = "";
+    }
 
     public Configuration(String format) {
         //TODO: initialise the only field of this class using ’format’;
@@ -11,7 +16,12 @@ public class Configuration extends Puzzle15Matrix {
         return this.data;
     }
 
-    public int[][] initialise(int[][] tiles) {
+    // set method for the data
+    public void setData(String newData) {
+        this.data = newData;
+    }
+
+    public void initialise(int[][] tiles) {
         //TODO: update the elements in the 2D array representing the values
         // of ’tiles’ as expressed by the contents of the field ’data’.
         String[] array = this.data.split(" ");
@@ -25,16 +35,18 @@ public class Configuration extends Puzzle15Matrix {
                 }
                 tiles[row][coloumn] = Integer.parseInt(array[i]);
                 coloumn++;
+            } else {
+                continue;
             }
         }
-        return tiles;
     }
 
-    public byte[] initialise(byte[] tiles) {
+    public void initialise(byte[] tiles) {
         String[] array = this.data.split(" ");
+        int index = 0;
         for (int i = 0; i < array.length; i++) {
-            tiles[i] = Byte.parseByte(array[i]);
+            tiles[index] = Byte.parseByte(array[i]); 
+            index++;  
         }
-        return tiles;
     }
 }
