@@ -25,12 +25,14 @@ public class Configuration {
         int row = 0;
         int col = 0;
         for (int i = 1; i <= values.length ; i++) {
-            if ((col % this.size == 0)  && col != 0) {
-                row++;
-                col = 0;
+            if (!(values[i-1].equals(":"))) {
+                if ((col % this.size == 0)  && col != 0) {
+                    row++;
+                    col = 0;
+                }
+                t.setTile(row, col, Byte.parseByte(values[i-1]));
+                col++;
             }
-            t.setTile(row, col, Byte.parseByte(values[i-1]));
-            col++;
         }
     }
 } 

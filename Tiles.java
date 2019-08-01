@@ -35,12 +35,13 @@ public abstract class Tiles {
     public abstract void setTile(int row, int col, byte newValue);
      
     // abstract methods
-    public abstract void move(Direction direction);
     protected abstract void moveImpl(Direction direction);
     public abstract boolean isSolved();
 
-    // not-abstact methods
-       protected void increamentMoveCount() {
+    // non-abstact methods
+     public void move(Direction direction) {
+        this.moveImpl(direction);
         this.moves++;
     }
+      
 }

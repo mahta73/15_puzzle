@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 public class ArrayTiles extends Tiles {
     private byte[] tiles;
     private int emptyPos;
@@ -29,7 +27,7 @@ public class ArrayTiles extends Tiles {
         this.tiles[pos] = newValue;
     }
 
-    public byte getTile(int col, int row) {
+    public byte getTile(int row, int col) {
         // check if the col and row values are elligible
         if ( col < 0 || col > this.getConfiguration().getSize() || row < 0 || row > this.getConfiguration().getSize()) {
             System.out.println("Fatal Error(index): index cannot be greater than the array's size or less than zeroo");
@@ -42,29 +40,25 @@ public class ArrayTiles extends Tiles {
         return this.tiles[pos];
     }
 
-    protected void moveImpl(Direction direction) {
-
-    }
-
     // move
-    public void move(Direction direction) {
+    protected void moveImpl(Direction direction) {
         switch(direction) {
             case UP:
                 // indicates sliding up the tile that is initially below the empty space,
-                if (!(this.emptyPos+4 > this.tiles.length)) {
-                    this.tiles[emptyPos] = this.tiles[emptyPos+4];
-                    this.tiles[emptyPos+4] = 0;
-                    emptyPos += 4;
+                if (!(this.emptyPos+this.getSize() >= this.tiles.length)) {
+                    this.tiles[emptyPos] = this.tiles[emptyPos+this.getSize()];
+                    this.tiles[emptyPos+this.getSize()] = 0;
+                    emptyPos += this.getSize();
                 } else {
                     System.out.println("Error: Your are trying to move out of the board");
                 }
                 break;
             case DOWN:
                 // is for the tile above the empty space
-                if (!(this.emptyPos-4 < 0)) {
-                    this.tiles[this.emptyPos] = this.tiles[this.emptyPos-4];
-                    this.tiles[this.emptyPos-4] = 0;
-                    emptyPos -= 4;
+                if (!(this.emptyPos-this.getSize() < 0)) {
+                    this.tiles[this.emptyPos] = this.tiles[this.emptyPos-this.getSize()];
+                    this.tiles[this.emptyPos-this.getSize()] = 0;
+                    emptyPos -= this.getSize();
                 } else {
                     System.out.println("Error: Your are trying to move out of the board");
                 }
@@ -109,59 +103,5 @@ public class ArrayTiles extends Tiles {
             }
             return true;
         }
-    }
-
-     public void printTiles() {
-        System.out.println("moves: " + this.getMoveCount());
-        for (int i = 0; i < this.tiles.length; i++) {
-            if (i  % 4 == 0) {
-                System.out.println();
-                System.out.println("---------------------");
-            }
-            if (this.tiles[i] == 0) {
-                System.out.print(" |  | ");
-            } else {
-                System.out.print(" |" + this.tiles[i] + "| ");
-            }
-                
-        }
-        System.out.println();
-        System.out.println("---------------------");
-    }
-
-    public void play() {
-        this.printTiles();
-        while(!this.isSolved()) {
-            Scanner keyboard = new Scanner(System.in);
-            char direction = keyboard.next().charAt(0);
-            this.increamentMoveCount();
-            Direction d;
-            switch(direction) {
-                case '0':
-                    d = Direction.UP;
-                    this.move(d);
-                    this.printTiles();
-                    break;
-                case '1':
-                    d = Direction.DOWN;
-                    this.move(d);
-                    this.printTiles();
-                    break;
-                case '2':
-                    d = Direction.LEFT;
-                    this.move(d);
-                    this.printTiles();
-                    break;
-                case '3':
-                    d = Direction.RIGHT;
-                    this.move(d);
-                    this.printTiles();
-                    break;
-                case 'q':
-                    System.exit(0);
-                    break;
-            } 
-        }
-        System.exit(0);
     }
 }
